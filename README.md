@@ -14,6 +14,7 @@
 
 #### TO-DOs:
 ###### Enable backend scheduled queue (spring boot) https://blog.csdn.net/wqh8522/article/details/79224290
+###### MailGun https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-via-smtp
 ###### Backend Paypal service
 ###### EC2, RDS deployment
 ###### mobile end code refactor
