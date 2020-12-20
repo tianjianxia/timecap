@@ -14,6 +14,7 @@
 
 #### TO-DOs:
 ###### Enable backend scheduled queue (spring boot) https://blog.csdn.net/wqh8522/article/details/79224290
+###### Backend Paypal service
 ###### EC2, RDS deployment
 ###### mobile end code refactor
 
