@@ -1,5 +1,7 @@
 # Timecap
 
+##### This project is an Android Distributed Project developed independently by Tj Xia
+
 #### User Story
 >1. User login the app by Google Account
 >2. Customized short message delivery
