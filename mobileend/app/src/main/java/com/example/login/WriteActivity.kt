@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.login.api.api
 import kotlinx.android.synthetic.main.activity_write.*
 import okhttp3.*
 import org.json.JSONObject
@@ -28,7 +29,7 @@ class WriteActivity : AppCompatActivity() {
     var cy : Int? = null
     var cm : Int? = null
     var cd : Int? = null
-    var find : Boolean = false
+    val api : api = api()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +42,20 @@ class WriteActivity : AppCompatActivity() {
         }
         usermail = intent.getStringExtra("mail")
 
-        val okHttpClient = OkHttpClient()
+        api.getUser(usermail!!){
+            val json = JSONObject(it)
+            val purchasea = json.get("purchaseda").toString().toBoolean()
+            val purchaseb = json.get("purchasedb").toString().toBoolean()
+            runOnUiThread {
+                gallery.visibility = if(purchasea) View.VISIBLE else View.INVISIBLE
+                camera.visibility = if(purchaseb) View.VISIBLE else View.INVISIBLE
+                if(!purchasea && !purchaseb){
+                    imageView.layoutParams.height = 0
+                }
+            }
+        }
+
+        /*val okHttpClient = OkHttpClient()
         val get_user: Request = Request.Builder().url("http://10.0.2.2:8088/user/" + usermail!!).build()
         okHttpClient.newCall(get_user).enqueue(object:Callback{
             override fun onFailure(call: Call, e: IOException) {
@@ -63,7 +77,7 @@ class WriteActivity : AppCompatActivity() {
                 }
             }
 
-        })
+        })*/
         
         val c = Calendar.getInstance()
         val cal_y = c.get(Calendar.YEAR)
@@ -154,9 +168,35 @@ class WriteActivity : AppCompatActivity() {
                 json_body.put("sendDate", cy!!.toString() + "-" + cm!!.toString() + "-" + cd!!.toString())
                 json_body.put("openDate", y!!.toString() + "-" + m!!.toString() + "-" + d!!.toString())
                 val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_body.toString())
+                api.putMail(body){
+                    api.getCurrentMail {
+                        val mailId = it
+                        json_body.put("text", input_content.text!!.toString())
+                        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_body.toString())
+                        api.putText(body){
+                            val textId = it
+                            api.updateTextId(mailId, textId)
+                        }
+                        api.updateImageIdNull(mailId)
+                        if(file != null){
+                            val imageName: String = file!!.getName()
+                            Upload(file!!).execute(
+                                imageName,
+                                "***************",
+                                "**********************"
+                            )
+                            val json = JSONObject()
+                            json.put("file", file!!.getName())
+                            val body_image = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json.toString())
+                            api.putImage(body_image){
+                                val imageId = it
+                                api.updateImageId(mailId, imageId)
+                            }
+                        }
+                    }
+                }
 
-
-                val request_mail: Request = Request.Builder()
+                /*val request_mail: Request = Request.Builder()
                     .url("http://10.0.2.2:8088/mail")
                     .post(body)
                     .build()
@@ -223,7 +263,7 @@ class WriteActivity : AppCompatActivity() {
                                 })
 
 
-                                /*val json = JSONObject(body_mailId)*/
+                                *//*val json = JSONObject(body_mailId)*//*
                                 val mailId = body_mailId.toString()
                                 println("aaaaaaa" + mailId)
                                 val request_postImage: Request = Request.Builder().url("http://10.0.2.2:8088/mail/image/"+ mailId + "/0").build()
@@ -283,7 +323,7 @@ class WriteActivity : AppCompatActivity() {
                                                     println("          " + body)
                                                     val okHttpClient = OkHttpClient()
                                                     println("wisndasd      " + body_mailId)
-                                                    /*val json = JSONObject(body_mailId)*/
+                                                    *//*val json = JSONObject(body_mailId)*//*
                                                     val mailId = body_mailId.toString()
                                                     val request_postImage: Request = Request.Builder().url("http://10.0.2.2:8088/mail/image/"+ mailId + "/" + body).build()
                                                     okHttpClient.newCall(request_postImage).enqueue(object:Callback{
@@ -315,13 +355,13 @@ class WriteActivity : AppCompatActivity() {
                         })
 
                     }
-                })
+                })*/
 
 
 
 
 
-                //Jenkins
+                /*//Jenkins
                 val json_jenkins = JSONObject()
                 val path = if(file == null) "" else "https://timecapsuleforandroid.s3.us-east-2.amazonaws.com/" + file!!.name.toString()
                 json_jenkins.put("from", usermail!!)
@@ -343,7 +383,17 @@ class WriteActivity : AppCompatActivity() {
 
                     }
 
-                })
+                })*/
+
+                val json_send = JSONObject()
+                val path = if(file == null) "" else "https://timecapsuleforandroid.s3.us-east-2.amazonaws.com/" + file!!.name.toString()
+                json_send.put("to", input_recieve.text!!.toString())
+                json_send.put("content", input_content.text!!.toString())
+                json_send.put("path", path)
+                json_send.put("date", m!!.toString() + "-" + d!!.toString() + "-" + y!!.toString())
+                val body_send = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_send.toString())
+
+                api.sendMail(body_send)
 
                 Toast.makeText(applicationContext, "Capsule sent!", Toast.LENGTH_LONG).show()
                 onBackPressed()

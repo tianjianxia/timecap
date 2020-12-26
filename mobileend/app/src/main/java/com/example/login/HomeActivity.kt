@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
+import com.example.login.api.api
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_write.*
@@ -17,6 +18,7 @@ import java.io.IOException
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     var usermail : String? = null
+    val api : api = api()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -27,7 +29,13 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toolbar.setTitle("Time Capsule")
         setSupportActionBar(toolbar)
 
-        val okHttpClient = OkHttpClient()
+        api.userCheck(usermail!!){
+            if(!it){
+                api.newUser(usermail!!)
+            }
+        }
+
+        /*val okHttpClient = OkHttpClient()
         val request_check: Request = Request.Builder()
             .url("http://10.0.2.2:8088/user/check/" + usermail!!)
             .build()
@@ -66,7 +74,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     })
                 }
             }
-        })
+        })*/
 
         val toggle = ActionBarDrawerToggle(this, mainAct, toolbar, R.string.open, R.string.close)
         toggle.isDrawerIndicatorEnabled = true

@@ -2,7 +2,6 @@ package com.timecap.apiService.Service;
 
 import com.timecap.apiService.Dao.MailDao;
 import com.timecap.apiService.Do.MailDo;
-import com.timecap.apiService.Jenkins.JobApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +32,5 @@ public class MailService {
         return mailDao.getMail(id);
     }
 
-    public void jenkins(Map<String, String> map) {
-        JobApi ja = new JobApi();
-        ja.buildParamJob(map);
-    }
+
 }

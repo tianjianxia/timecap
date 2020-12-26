@@ -1,6 +1,7 @@
 package com.example.login
 
 import android.annotation.SuppressLint
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
+import com.example.login.api.api
 import com.google.gson.GsonBuilder
 import okhttp3.Call
 import okhttp3.Callback
@@ -23,6 +25,7 @@ private const val ARG_PARAM1 = "param1"
 private val okHttpClient = OkHttpClient()
 class HomeFragment : Fragment() {
     var usermail : String? = null
+    val api : api = api()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -43,7 +46,23 @@ class HomeFragment : Fragment() {
 
         println(usermail)
 
-        val Uri_1 = "http://10.0.2.2:8088/user/" + usermail!!
+        api.getUser(usermail!!){
+            val gson = GsonBuilder().create()
+            val Json = gson.fromJson(it, UserDo::class.java)
+
+            //Switch to the UI Thread
+            runOnUiThread {
+                val username = view.findViewById<TextView>(R.id.username)
+                val token = view.findViewById<TextView>(R.id.token)
+                val token2 = view.findViewById<TextView>(R.id.token2)
+
+                username.text = usermail!!
+                token.text = "Gallery Access:" + if(Json.purchaseda) "Token access activated." else "No token access."
+                token2.text = "Camera Access:" + if(Json.purchasedb) "Token access activated." else "No token access."
+            }
+        }
+
+        /*val Uri_1 = "http://10.0.2.2:8088/user/" + usermail!!
         val request_1 : Request = Request.Builder()
             .url(Uri_1)
             .build()
@@ -79,9 +98,19 @@ class HomeFragment : Fragment() {
                     ).show();
                 }
             }
-        })
+        })*/
 
-        val Uri_2 = "http://10.0.2.2:8088/user/count/" + usermail!!
+        api.mailCount(usermail!!){
+            runOnUiThread {
+                val write = view.findViewById<TextView>(R.id.write)
+
+                write.text = it.toString()
+            }
+        }
+
+
+
+        /*val Uri_2 = "http://10.0.2.2:8088/user/count/" + usermail!!
         val request_2 : Request = Request.Builder()
             .url(Uri_2)
             .build()
@@ -109,7 +138,7 @@ class HomeFragment : Fragment() {
                     ).show();
                 }
             }
-        })
+        })*/
 
     }
 
