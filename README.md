@@ -42,7 +42,7 @@
 ###### Third-party service
 - Google OAuth
 - Paypal Pay service
-- MailGun
+- SendGrid
 
 ###### Tech Stack
 - Android + Spring boot + MySQL
