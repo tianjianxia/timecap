@@ -249,8 +249,8 @@ class WriteActivity : AppCompatActivity() {
                                     val imageName: String = file!!.getName()
                                     Upload(file!!).execute(
                                         imageName,
-                                        "AKIAIUSIRZXVAX7DM4TQ",
-                                        "ars6L16rhstUO8F5pKAmQGypArkCzzq4wCZCBVFY"
+                                        "***************",
+                                        "**********************"
                                     )
                                     val okHttpClient = OkHttpClient()
                                     val get_current: Request = Request.Builder().url("http://10.0.2.2:8088/mail/current").build()
