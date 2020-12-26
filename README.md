@@ -13,9 +13,8 @@
 
 
 #### TO-DOs:
-###### Enable backend scheduled queue (spring boot) https://blog.csdn.net/wqh8522/article/details/79224290
-###### MailGun https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-via-smtp
-###### Backend Paypal service
+###### (Completed 12/25) Enable backend delay service (raw java) https://blog.csdn.net/Uhzgnaw/article/details/45935645
+###### (Completed 12/25) SendGrid
 ###### EC2, RDS deployment
 ###### mobile end code refactor
 
@@ -24,8 +23,8 @@
 -----------
 
 
-###### mailGun API
-- https://documentation.mailgun.com/en/latest/api-sending.html#examples
+###### SendGrid API
+- https://sendgrid.com/docs/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates/
 
 ###### Kotlin refactor
 - project structure
@@ -33,7 +32,7 @@
 
 
 ###### Cloud Service
-- spring boot - EC2
+- Spring boot - EC2
 - media storage - S3
 - MySQL - RDS
 
