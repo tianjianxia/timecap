@@ -19,6 +19,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
+import com.example.login.api.api
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter
 import kotlinx.android.synthetic.main.fragment_profile.*
 import okhttp3.*
@@ -33,6 +34,7 @@ private const val ARG_PARAM1 = "param1"
 class ProfileFragment : Fragment(), mailAdapter.AdapterListener  {
     var mailAdapter : mailAdapter? = null
     var usermail : String? = null
+    val api : api = api()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +53,48 @@ class ProfileFragment : Fragment(), mailAdapter.AdapterListener  {
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mailListener: mailAdapter.AdapterListener = this
-        val okHttpClient = OkHttpClient()
+
+        api.getMailList(usermail!!){
+            val json = JSONArray(it)
+            val arr = ArrayList<Mail>()
+            for (i in 0 until json.length()) {
+                val item = json.getJSONObject(i)
+                val id = item.get("id").toString()
+                val from = item.get("fromUser").toString()
+                val to = item.get("toUser").toString()
+                val senddate = LocalDate.parse(
+                    item.get("sendDate").toString(),
+                    DateTimeFormatter.ISO_DATE
+                )
+                val opendate = LocalDate.parse(
+                    item.get("openDate").toString(),
+                    DateTimeFormatter.ISO_DATE
+                )
+
+                val m = Mail(id, from, to, senddate, opendate)
+                arr.add(m)
+            }
+
+            ThreadUtils.runOnUiThread {
+                mailAdapter = mailAdapter(arr)
+                mailAdapter!!.setAdapterListener(mailListener)
+                mailList.apply {
+                    layoutManager = LinearLayoutManager(view.context)
+                    adapter = AlphaInAnimationAdapter(mailAdapter!!).apply {
+                        setDuration(1000)
+                        setInterpolator(OvershootInterpolator())
+                        setFirstOnly(false)
+                    }
+                }
+            }
+        }
+
+        /*val okHttpClient = OkHttpClient()
         val request_mailIds: Request = Request.Builder()
             .url("http://10.0.2.2:8088/user/mail/" + usermail!!)
             .build()
@@ -102,7 +141,7 @@ class ProfileFragment : Fragment(), mailAdapter.AdapterListener  {
                 }
             }
 
-        })
+        })*/
 
 
         donate.setOnClickListener {

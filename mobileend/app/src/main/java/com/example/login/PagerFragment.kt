@@ -10,6 +10,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
+import com.example.login.api.api
+import com.example.login.config.Config
 import com.squareup.picasso.Picasso
 import okhttp3.*
 import org.json.JSONObject
@@ -25,6 +27,8 @@ private const val ARG_PARAM2 = "param2"
 class PagerFragment : Fragment() {
     var mailId: String? = null
     var type: Int? = null
+    val api : api = api()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -44,87 +48,36 @@ class PagerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(type == 1){
-            val okHttpClient = OkHttpClient()
-            val request_mail: Request = Request.Builder().url("http://10.0.2.2:8088/mail/" + mailId).build()
-            okHttpClient.newCall(request_mail).enqueue(object: Callback {
-                override fun onFailure(call: Call, e: IOException) {
-
-                }
-
-                @RequiresApi(Build.VERSION_CODES.O)
-                override fun onResponse(call: Call, response: Response) {
-                    val c = response.code()
-                    val body = response.body()?.string()
-                    val js = JSONObject(body)
-                    val textId = js.get("text")
-
-                    val okHttpClient = OkHttpClient()
-                    val request_text: Request = Request.Builder().url("http://10.0.2.2:8088/text/" + textId).build()
-                    okHttpClient.newCall(request_text).enqueue(object:Callback{
-                        override fun onFailure(call: Call, e: IOException) {
-
-                        }
-
-                        override fun onResponse(call: Call, response: Response) {
-                            val c = response.code()
-                            val body = response.body()?.string()
-                            val js = JSONObject(body)
-                            val text_ = js.get("text")
-                            ThreadUtils.runOnUiThread {
-                                val text = view.findViewById<TextView>(R.id.textView)
-                                text.text = text_.toString()
-                            }
-                        }
-
-                    })
-                }
-
-            })
-
-
-        } else {
-            val okHttpClient = OkHttpClient()
-            val request_mail: Request = Request.Builder().url("http://10.0.2.2:8088/mail/" + mailId).build()
-            okHttpClient.newCall(request_mail).enqueue(object: Callback {
-                override fun onFailure(call: Call, e: IOException) {
-
-                }
-
-                @RequiresApi(Build.VERSION_CODES.O)
-                override fun onResponse(call: Call, response: Response) {
-                    val c = response.code()
-                    val body = response.body()?.string()
-                    val js = JSONObject(body)
-                    val imageId = js.get("image")
-                    if(imageId.toString().toInt() == 0){
-                        return
+            api.getMailInfo(mailId!!){
+                val js = JSONObject(it)
+                val textId = js.get("text").toString()
+                api.getText(textId){
+                    val js = JSONObject(it)
+                    val text_ = js.get("text")
+                    ThreadUtils.runOnUiThread {
+                        val text = view.findViewById<TextView>(R.id.textView)
+                        text.text = text_.toString()
                     }
-
-                    val okHttpClient = OkHttpClient()
-                    val request_text: Request = Request.Builder().url("http://10.0.2.2:8088/image/" + imageId).build()
-                    okHttpClient.newCall(request_text).enqueue(object:Callback{
-                        override fun onFailure(call: Call, e: IOException) {
-
-                        }
-
-                        override fun onResponse(call: Call, response: Response) {
-                            val c = response.code()
-                            val body = response.body()?.string()
-                            val js = JSONObject(body)
-                            val filename = js.get("file")
-                            ThreadUtils.runOnUiThread {
-                                val text = view.findViewById<TextView>(R.id.textView)
-                                text.layoutParams.height = 0
-                                val img = view.findViewById<ImageView>(R.id.detailImage)
-                                val path : String = "https://timecapsuleforandroid.s3.us-east-2.amazonaws.com/" + filename.toString()
-                                Picasso.get().load(path).into(img)
-                            }
-                        }
-
-                    })
                 }
-
-            })
+            }
+        } else {
+            api.getMailInfo(mailId!!){
+                val js = JSONObject(it)
+                val imageId = js.get("image").toString()
+                if(imageId.toInt() != 0){
+                    api.getImage(imageId){
+                        val js = JSONObject(it)
+                        val filename = js.get("file")
+                        ThreadUtils.runOnUiThread {
+                            val text = view.findViewById<TextView>(R.id.textView)
+                            text.layoutParams.height = 0
+                            val img = view.findViewById<ImageView>(R.id.detailImage)
+                            val path : String = Config.awsS3Endpoint + filename.toString()
+                            Picasso.get().load(path).into(img)
+                        }
+                    }
+                }
+            }
         }
     }
 

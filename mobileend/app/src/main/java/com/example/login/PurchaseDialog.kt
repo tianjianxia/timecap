@@ -33,7 +33,7 @@ class PurchaseDialog : DialogFragment() {
                 .setPositiveButton("Buy",
                     DialogInterface.OnClickListener { dialog, id ->
                         val gc = if(type == 1) "a" else "b"
-                        val okHttpClient = OkHttpClient()
+                        /*val okHttpClient = OkHttpClient()
                         val request_a: Request = Request.Builder()
                             .url("http://10.0.2.2:8088/user/"+ gc +"/" + usermail!!)
                             .build()
@@ -49,7 +49,7 @@ class PurchaseDialog : DialogFragment() {
 
                         })
                         val uri: Uri = Uri.parse("https://www.paypal.com/c2/home?locale.x=en_C2")
-                        startActivity(Intent(Intent.ACTION_VIEW, uri))
+                        startActivity(Intent(Intent.ACTION_VIEW, uri))*/
                     })
                 .setNegativeButton("Cancel",
                     DialogInterface.OnClickListener { dialog, id ->

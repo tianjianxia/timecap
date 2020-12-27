@@ -84,14 +84,14 @@ class api {
 
     // get user
     fun getUser(usermail : String, then: ((String) -> Unit)){
-        val request: Request = Request.Builder().url("http://10.0.2.2:8088/user/" + usermail!!).build()
+        val url = Config.apiEndpoint + "/user/" + usermail
+        val request: Request = Request.Builder().url(url).build()
         okHttpClient.newCall(request).enqueue(object:Callback{
             override fun onFailure(call: Call, e: IOException) {
 
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val code = response.code()
                 val body = response.body()?.string()
                 then(body.toString())
             }
@@ -138,7 +138,7 @@ class api {
 
     // put text
     fun putText(body : RequestBody, then: ((String) -> Unit)){
-        val url = Config.apiEndpoint
+        val url = Config.apiEndpoint + "/text"
         val request: Request = Request.Builder()
             .url(url)
             .post(body)

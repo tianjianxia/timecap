@@ -12,11 +12,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.login.api.api
+import com.example.login.config.Config
 import kotlinx.android.synthetic.main.activity_write.*
 import okhttp3.*
 import org.json.JSONObject
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 
@@ -38,11 +38,12 @@ class WriteActivity : AppCompatActivity() {
         toolbar2.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         setSupportActionBar(toolbar2)
         toolbar2.setNavigationOnClickListener {
-            supportFragmentManager.beginTransaction().replace(R.id.meContainer, HomeFragment.newInstance(usermail!!), "Home").commit()
+            onBackPressed()
         }
         usermail = intent.getStringExtra("mail")
 
         api.getUser(usermail!!){
+            println(usermail)
             val json = JSONObject(it)
             val purchasea = json.get("purchaseda").toString().toBoolean()
             val purchaseb = json.get("purchasedb").toString().toBoolean()
@@ -54,30 +55,6 @@ class WriteActivity : AppCompatActivity() {
                 }
             }
         }
-
-        /*val okHttpClient = OkHttpClient()
-        val get_user: Request = Request.Builder().url("http://10.0.2.2:8088/user/" + usermail!!).build()
-        okHttpClient.newCall(get_user).enqueue(object:Callback{
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val code = response.code()
-                val body = response.body()?.string()
-                val json = JSONObject(body)
-                val purchasea = json.get("purchaseda").toString().toBoolean()
-                val purchaseb = json.get("purchasedb").toString().toBoolean()
-                runOnUiThread {
-                    gallery.visibility = if(purchasea) View.VISIBLE else View.INVISIBLE
-                    camera.visibility = if(purchaseb) View.VISIBLE else View.INVISIBLE
-                    if(!purchasea && !purchaseb){
-                        imageView.layoutParams.height = 0
-                    }
-                }
-            }
-
-        })*/
         
         val c = Calendar.getInstance()
         val cal_y = c.get(Calendar.YEAR)
@@ -182,8 +159,8 @@ class WriteActivity : AppCompatActivity() {
                             val imageName: String = file!!.getName()
                             Upload(file!!).execute(
                                 imageName,
-                                "***************",
-                                "**********************"
+                                Config.awsKey,
+                                Config.awsKeyPair
                             )
                             val json = JSONObject()
                             json.put("file", file!!.getName())
@@ -195,195 +172,6 @@ class WriteActivity : AppCompatActivity() {
                         }
                     }
                 }
-
-                /*val request_mail: Request = Request.Builder()
-                    .url("http://10.0.2.2:8088/mail")
-                    .post(body)
-                    .build()
-
-                okHttpClient.newCall(request_mail).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        // Handle this
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        val code = response.code()
-                        val body_mailId = response.body()?.string()
-                        println(code.toString() + " " + body_mailId)
-                        val okHttpClient = OkHttpClient()
-                        val get_current: Request = Request.Builder().url("http://10.0.2.2:8088/mail/current").build()
-                        okHttpClient.newCall(get_current).enqueue(object:Callback{
-                            override fun onFailure(call: Call, e: IOException) {
-
-                            }
-
-                            override fun onResponse(call: Call, response: Response) {
-                                val code = response.code()
-                                val body_mailId = response.body()?.string()
-                                println(code.toString()+ " "+ body_mailId)
-                                val okHttpClient = OkHttpClient()
-                                val json_body = JSONObject()
-                                json_body.put("text", input_content.text!!.toString())
-                                val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_body.toString())
-
-                                val request_text: Request = Request.Builder()
-                                    .url("http://10.0.2.2:8088/text")
-                                    .post(body)
-                                    .build()
-                                okHttpClient.newCall(request_text).enqueue(object:Callback{
-                                    override fun onFailure(call: Call, e: IOException) {
-
-                                    }
-
-                                    override fun onResponse(call: Call, response: Response) {
-                                        val code = response.code()
-                                        val body = response.body()?.string()
-                                        println(code.toString()+ " "+ body)
-                                        println(body_mailId + " " + body)
-                                        val okHttpClient = OkHttpClient()
-                                        //val json = JSONObject(body_mailId)
-                                        val mailId = body_mailId.toString()
-                                        val request_postText: Request = Request.Builder().url("http://10.0.2.2:8088/mail/text/"+ mailId + "/" + body).build()
-                                        okHttpClient.newCall(request_postText).enqueue(object:Callback{
-                                            override fun onFailure(call: Call, e: IOException) {
-
-                                            }
-
-                                            override fun onResponse(
-                                                call: Call,
-                                                response: Response
-                                            ) {
-                                                val code = response.code()
-                                                val body = response.body()?.string()
-                                                println(code.toString()+ " "+ body)
-                                            }
-
-                                        })
-                                    }
-                                })
-
-
-                                *//*val json = JSONObject(body_mailId)*//*
-                                val mailId = body_mailId.toString()
-                                println("aaaaaaa" + mailId)
-                                val request_postImage: Request = Request.Builder().url("http://10.0.2.2:8088/mail/image/"+ mailId + "/0").build()
-                                okHttpClient.newCall(request_postImage).enqueue(object:Callback{
-                                    override fun onFailure(call: Call, e: IOException) {
-
-                                    }
-
-                                    override fun onResponse(
-                                        call: Call,
-                                        response: Response
-                                    ) {
-                                        val code = response.code()
-                                        val body = response.body()?.string()
-                                        println("bbbbbbb" + code.toString()+ " "+ body)
-                                        println("cccccccc" + body_mailId + " " + body)
-                                    }
-
-                                })
-
-                                if (file != null) {
-                                    // with picture
-                                    val imageName: String = file!!.getName()
-                                    Upload(file!!).execute(
-                                        imageName,
-                                        "***************",
-                                        "**********************"
-                                    )
-                                    val okHttpClient = OkHttpClient()
-                                    val get_current: Request = Request.Builder().url("http://10.0.2.2:8088/mail/current").build()
-
-                                    okHttpClient.newCall(get_current).enqueue(object : Callback {
-                                        override fun onFailure(call: Call, e: IOException) {
-                                            // Handle this
-                                        }
-
-                                        override fun onResponse(call: Call, response: Response) {
-                                            // Handle this
-                                            val code = response.code()
-                                            val body_mailId = response.body()?.string()
-                                            val okHttpClient = OkHttpClient()
-                                            val json_body = JSONObject()
-                                            json_body.put("file", file!!.getName())
-                                            val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_body.toString())
-                                            val request_image: Request = Request.Builder()
-                                                .url("http://10.0.2.2:8088/image")
-                                                .post(body)
-                                                .build()
-                                            okHttpClient.newCall(request_image).enqueue(object:Callback{
-                                                override fun onFailure(call: Call, e: IOException) {
-
-                                                }
-
-                                                override fun onResponse(call: Call, response: Response) {
-                                                    val code = response.code()
-                                                    val body = response.body()?.string()
-                                                    println("          " + body)
-                                                    val okHttpClient = OkHttpClient()
-                                                    println("wisndasd      " + body_mailId)
-                                                    *//*val json = JSONObject(body_mailId)*//*
-                                                    val mailId = body_mailId.toString()
-                                                    val request_postImage: Request = Request.Builder().url("http://10.0.2.2:8088/mail/image/"+ mailId + "/" + body).build()
-                                                    okHttpClient.newCall(request_postImage).enqueue(object:Callback{
-                                                        override fun onFailure(call: Call, e: IOException) {
-
-                                                        }
-
-                                                        override fun onResponse(
-                                                            call: Call,
-                                                            response: Response
-                                                        ) {
-
-                                                        }
-
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    })
-
-
-                                }
-
-
-
-
-                            }
-
-                        })
-
-                    }
-                })*/
-
-
-
-
-
-                /*//Jenkins
-                val json_jenkins = JSONObject()
-                val path = if(file == null) "" else "https://timecapsuleforandroid.s3.us-east-2.amazonaws.com/" + file!!.name.toString()
-                json_jenkins.put("from", usermail!!)
-                json_jenkins.put("to", input_recieve.text!!.toString())
-                json_jenkins.put("content", input_content.text!!.toString())
-                json_jenkins.put("path", path)
-                json_jenkins.put("opendate", y!!.toString() + "-" + m!!.toString() + "-" + d!!.toString())
-                val body_jenkins = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json_jenkins.toString())
-                val request_jenkins: Request = Request.Builder()
-                    .url("http://10.0.2.2:8088/mail/jenkins")
-                    .post(body_jenkins)
-                    .build()
-                okHttpClient.newCall(request_jenkins).enqueue(object:Callback{
-                    override fun onFailure(call: Call, e: IOException) {
-
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-
-                    }
-
-                })*/
 
                 val json_send = JSONObject()
                 val path = if(file == null) "" else "https://timecapsuleforandroid.s3.us-east-2.amazonaws.com/" + file!!.name.toString()
