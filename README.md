@@ -17,8 +17,9 @@
 #### TO-DOs:
 ###### (Completed 12/25) Enable backend delay service (raw java) https://blog.csdn.net/Uhzgnaw/article/details/45935645
 ###### (Completed 12/25) SendGrid
-###### EC2, RDS deployment
-###### mobile end code refactor
+###### (Completed 12/26) EC2, RDS deployment
+###### (Completed 12/26) mobile end code refactor
+###### Integrate Paypal service
 
 
 
